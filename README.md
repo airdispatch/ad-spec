@@ -11,8 +11,8 @@ The protocol is able to abstract away the problems of addressing, security, and 
 
 ### Table of Contents
 
-  1. Summary of Terms
-  2. Message Structure
+  1. [Summary of Terms](https://github.com/airdispatch/ad-spec#summary-of-terms)
+  2. [Message Structure](https://github.com/airdispatch/ad-spec#message-structure)
   3. Message Signatures
   4. Messsage Types
     1. Tracker Messages
