@@ -5,7 +5,7 @@ This repository will contain the specifications for the Airdispatch protocol.
 
 ### Introduction
 
-Airdispatch is a new protocol that seeks to make it easier to provide federated communications platforms. Currently, new services spring up everyday that provide immense functionality to the user with the caveat of being centralized. Airdispatch aims to make more and more products into interoperable services.
+Airdispatch is a new application-level protocol that seeks to make it easier to provide federated communications platforms. Currently, new services spring up everyday that provide immense functionality to the user with the caveat of being centralized. Airdispatch aims to make more and more products into interoperable services.
 
 The protocol is able to abstract away the problems of addressing, security, and delivery of messages so that developers can focus on the bigger issues. This spec will run through the expected usage of each of the components and how they should interact.
 
@@ -13,7 +13,7 @@ The protocol is able to abstract away the problems of addressing, security, and 
 
   1. [Summary of Terms](https://github.com/airdispatch/ad-spec#summary-of-terms)
   2. [Message Structure](https://github.com/airdispatch/ad-spec#message-structure)
-  3. Message Signatures
+  3. [Message Signatures](https://github.com/airdispatch/ad-spec#message-signatures)
   4. Messsage Types
     1. Tracker Messages
     2. Server Messages
@@ -56,6 +56,42 @@ Example:
     ..
     ..
 
-The body of the message is always encoded with [protocol buffers](https://code.google.com/p/protobuf/), so we do not have to worry about transferring primatives over the wire.
+The body of the message is always encoded with [protocol buffers](https://code.google.com/p/protobuf/), so we do not have to worry about the format by which we transfer primatives over the wire.
 
 ### Message Signatures
+
+All Airdispatch messages are signed with an [ECDSA](http://en.wikipedia.org/wiki/Elliptic_Curve_DSA) keypair. This ensures that addresses are not spoofed.
+
+We are currently using the P256 curve as specified by [FIPS](http://csrc.nist.gov/publications/fips/fips186-3/fips_186-3.pdf). This curve is also known as the secp256r1 curve as specified by [SECG](http://www.secg.org/collateral/sec2_final.pdf).
+
+Airdispatch converts the key (specified using 32-byte integers X and Y) to wire-transferrable bytes by concatenating the following values:
+
+  - 0x03 (this is used to identify the type of encryption key used, currently, the only supported value is 0x03 which specifies an ECDSA key on the P256 curve)
+  - 32-byte X Value in Big Endian Format
+  - 32-byte Y Value in Big Endian Format
+
+Each message transferred on the Airdisaptch protocol is embedded in the [SignedMessage data structure](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L102). It is as defined below:
+
+| Field        | Object Type  | Description                          | Protocol Buffers Field Number  |
+|--------------|--------------|--------------------------------------|--------------------------------|
+| payload      | Byte Array   | The actual message being transferred | 1 |
+| signing_key  | Byte Array   | The ECDSA public key converted to bytes as shown above | 2 |
+| signature    | `Signature`  | An additional data type that stores the signature | 3 |
+| message_type | string       | The type of message contained in the payload as defined in the Data Types section | 4 |
+| signature_function | string | **OPTIONAL**: currently unused, will be used in the future to specify using an algorithm other than ECDSA on the P256 curve | 5 |
+
+The `Signature` data structure ([implemented here](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L112)):
+
+| Field | Object Type | Description | Protocol Bufferes Field Number |
+|-------|-------------|-------------|--------------------------------|
+| r     | Byte Array  | The r parameter from the ECDSA signature function (big-endian) | 1 |
+| s     | Byte Array  | The s parameter from the ECDSA signature function (big-endian) | 2 |
+
+
+### Message Types
+
+#### Tracker Messages
+
+#### Server Messages
+
+#### Client Messages
