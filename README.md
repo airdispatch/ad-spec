@@ -25,7 +25,9 @@ The protocol is able to abstract away the problems of addressing, security, and 
     1. Responds To
     2. Returns
   7. Mail Data Format
+    1. Supported Data Types
   8. Race Conditions
+  9. Returning Errors
 
 ### Summary of Terms
 
@@ -89,6 +91,14 @@ The `Signature` data structure ([implemented here](https://github.com/airdispatc
 
 
 ### Message Types
+
+The current protocol is divided into several different types of messages as outlined below and defined in relevant sections.
+
+| Message Type  | Implementation Name | Description                            | Defined As      |
+|---------------|---------------------|----------------------------------------|-----------------|
+| REG           | AddressRegistration | Used to register an address and location with a tracker. | Tracker-Level |
+| QUE           | AddressRequest      | Used to query a tracker for an address's location. | Tracker-Level |
+| RES           | AddressResponse     | Returned by a tracker specifying the location for the requested address. | Tracker-Level |
 
 #### Tracker Messages
 
