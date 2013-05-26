@@ -96,9 +96,15 @@ The current protocol is divided into several different types of messages as outl
 
 | Message Type  | Implementation Name | Description                            | Defined As      |
 |---------------|---------------------|----------------------------------------|-----------------|
-| REG           | AddressRegistration | Used to register an address and location with a tracker. | Tracker-Level |
-| QUE           | AddressRequest      | Used to query a tracker for an address's location. | Tracker-Level |
-| RES           | AddressResponse     | Returned by a tracker specifying the location for the requested address. | Tracker-Level |
+| REG           | AddressRegistration | Used to register an address and location with a tracker. | Tracker |
+| QUE           | AddressRequest      | Used to query a tracker for an address's location. | Tracker |
+| RES           | AddressResponse     | Returned by a tracker specifying the location for the requested address. | Tracker |
+| ALE           | Alert               | Used to alert a receiving server to new mail. | Server |
+| RET           | RetrieveData        | Used to download data from a mailserver.      | Server |
+| SEN           | SendMailRequest     | Used to request that a server send a message on a client's behalf. | Client |
+| ARR           | ArrayedData         | Used to signifiy that multiple Airdispatch messages follow. | Utility |
+| MAI           | Mail                | The message type that holds the actual message. | Utility |
+| ---           | MailData            | The key-value store that is the message metadata. | Utility |
 
 #### Tracker Messages
 
