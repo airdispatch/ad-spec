@@ -148,4 +148,57 @@ The AddressResponse message is used to return the location of an address based o
 
 #### Server Messages
 
+###### ALE Message (Alert)
+
+The Alert message is sent from one server to another to communicate that the originating server has new mail for a user of the receiving server.
+
+| Field | Object Type | Description | Protocol Buffers Field Number |
+|-------|-------------|-------------|-------------------------------|
+| to_address | string | The receiving user's address. | 1 |
+| location   | string | OPTIONAL: The location of the mailserver that is holding the message. | 2 |
+| message_id | string | OPTIONAL: The unique identifier for the message being sent that should be inserted in the corresponding `RetrieveData` message. | 3 |
+| update_alert | bool | OPTIONAL: A boolean flag that signifies that this alert is to update an earlier message. | 4 |
+| update_message_id | string | OPTIONAL: The unique identifier for the message that was updated. | 5 |
+
+This protocol specifies the following acceptable configurations for this message (any fields not listed may be ommitted for the configuration):
+  - `to_address`, `message_id` all filled to signify that a new message is being sent.
+  - `to_address`, `message_id`, `update_alert`, `update_message_id` all filled to signify that the message with id `update_message_id` has a new version with id `message_id`. This configuration is henceforth known as an `update Alert message`.
+
+**NOTE ABOUT THE LOCATION FIELD**: The location field *should* be used for every Alert message to designate the mailserver that stores the message (in case the user changes mailservers). However, if it is unlikely that the user will change mailservers (and the location on file with the tracker is correct), it is unneeded.
+
+**NOTE ABOUT UPDATING MESSAGES**: Mailservers are expected to send an update Alert message anytime that an old message is updated. This allows the receiving client to do rudimentary version control of the message and caching. If a user updates a message without sending an update Alert message, the receiving server is not required to check for updates manually. (Unless you are dealing with a public message subscription which is talked about later in this document.)
+
+###### RET Message (RetrieveData)
+
+The RetrieveData message is sent from any network object to a server to download the contents of a message.
+
+| Field | Object Type | Description | Protocol Buffers Field Number |
+|-------|-------------|-------------|-------------------------------|
+| message_id | string | OPTIONAL: The unique identifier that specifies the message to download. It is originally delivered through the `Alert` message. | 1 |
+| since_date | uint64 | OPTIONAL: Used to request a list of messages sent after the specified time in seconds since the Unix Epoch. | 2 |
+| from_address | string | OPTIONAL: Used to specify that address that originally sent the message(s). | 3 |
+| retrieval_type | bytes | The type of retrieval that should be executed. Defined below. | 4 |
+
+Since the RetrieveData message is complex, we will define the acceptable message configurations in a table below.
+
+| Name | retrieval_type | Description | message_id | since_date | from_address |
+|------|----------------|-------------|------------|------------|--------------|
+| RETRIEVAL_TYPE_NORMAL | 0x00 00 | This is used to download a single message sent to the originating address. | The ID sent in the Alert | OMITTED | The address that sent the message. |
+| RETRIEVAL_TYPE_NORMAL | 0x00 00 | This is used to download multiple messages sent to the originating address. | OMITTED | The earliest timestamp of message that should be returned. | The address that sent the message. |
+| RETRIEVAL_TYPE_PUBLIC | 0x00 01 | This is used to download multiple public messages. | OMITTED | The earliest timestamp of message that should be returned. | The address that published the messages. |
+| RETRIEVAL_TYPE_MINE   | 0x00 02 | This is used to download the alerts sent to the originating address that have accumulated on a mailserver. (Usually sent by clients.) | OMITTED | The earliest timestamp of message that should be returned. | OMITTED |
+
+These different retrieval messages allow servers and clients to download data that has not been transferred yet.
+
+###### SEN Message (SendMailRequest)
+
+The SendMailRequest message is used to request that a server deliver a piece of mail. These messages are usually sent by a client.
+
+| Field | Object Type | Description | Protocol Buffers Field Number |
+|-------|-------------|-------------|-------------------------------|
+| to_address | repeated string | The array of addresses that the message should be delivered to. | 1 |
+| stored_message | Byte Array | A signed copy of the MAI message that should be transferred. | 2 |
+
+**Public Messages**: Some messages should be public an available to any user that subscribes to updates from a particular address. Messages can be designated as public if the `to_address` field is omitted.
+
 #### Utility Messages
