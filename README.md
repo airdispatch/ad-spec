@@ -17,7 +17,7 @@ The protocol is able to abstract away the problems of addressing, security, and 
   4. [Messsage Types](https://github.com/airdispatch/ad-spec/blob/master/README.md#message-types)
     1. Tracker Messages
     2. Server Messages
-    3. Client Messages
+    3. Utility Messages
   5. Server Protocol
     1. Responds To
     2. Returns
@@ -26,6 +26,7 @@ The protocol is able to abstract away the problems of addressing, security, and 
     2. Returns
   7. Mail Data Format
     1. Supported Data Types
+    2. Encryption
   8. Race Conditions
   9. Returning Errors
 
@@ -35,6 +36,8 @@ The protocol is able to abstract away the problems of addressing, security, and 
   - **Tracker**: Any object in the network graph that responds to tracker messages (Query and Registration) and keeps a database that maps airdispatch addresses to network locations (any resolvable address, IP or URL)
   - **Server**: (Also referred to as the 'mailserver') The location in the network that stores outgoing messages and receives incoming alerts for a specific user. A user may only have one mailserver associated with their address at a time.
   - **Client**: Software that interacts with the user to coordinate the sending and receiving of mail. This software must interact with the server (which actually sends and receives the mail).
+  - **Field Omission**: In terms of this protocol, a field may be considered 'omitted' if it is not present, initialized to `nil`, an empty array (for the `repeated` datatype), or the [protocol buffers empty value](https://developers.google.com/protocol-buffers/docs/proto#optional) for that data type.
+  - **Optional Field**: An optional field is one that may be omitted in a message. It is designated in this document by the word `OPTIONAL` in the field descritpion.
 
 ### Message Structure
 
@@ -101,13 +104,48 @@ The current protocol is divided into several different types of messages as outl
 | RES           | [AddressResponse](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L35)     | Returned by a tracker specifying the location for the requested address. | Tracker |
 | ALE           | [Alert](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L56)               | Used to alert a receiving server to new mail. | Server |
 | RET           | [RetrieveData](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L65)        | Used to download data from a mailserver.      | Server |
-| SEN           | [SendMailRequest](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L47)     | Used to request that a server send a message on a client's behalf. | Client |
+| SEN           | [SendMailRequest](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L47)     | Used to request that a server send a message on a client's behalf. | Server |
 | ARR           | [ArrayedData](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L77)         | Used to signifiy that multiple Airdispatch messages follow. | Utility |
 | MAI           | [Mail](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L82)                | The message type that holds the actual message. | Utility |
 | ---           | [MailData](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L88)            | The key-value store that contains the message data and metadata. | Utility |
 
 #### Tracker Messages
 
+The tracker is the portion of protocol that manages the translation of addresses and locations. This section will detail the structure of the messages that the tracker is associated with.
+
+###### REG Message (AddressRegistration)
+
+The AddressRegistration message is used to store the location of the mail server for a specific address with a tracker.
+
+| Field | Object Type | Description | Protocol Bufferes Field Number |
+|-------|-------------|-------------|--------------------------------|
+| address     | string  | The address being registered (this must match the key used to verify the signature of the message or the message will be discarded). | 1 |
+| public_key     | Byte Array  | The public key used to encrypt messages sent from this address (read more in section 7.2 on Encryption). NOTE: This is **not** the key used to sign messages. | 2 |
+| location    | string | Any DNS-resolvable (i.e. URL or IP address with a port number) string that designates the location of the mailserver that messages sent to this address should be forwarded to. | 3 |
+| username | string | OPTIONAL: This field is used to register a username with the tracker, so that addresses may be queried without knowing the long-form. | 4 |
+
+###### QUE Message (AddressRequest)
+
+The AddressRequest message is used to look-up the location of an address.
+
+| Field | Object Type | Description | Protocol Buffers Field Number |
+|-------|-------------|-------------|-------------------------------|
+| address | string | OPTIONAL: The address that is being queried for. | 1 |
+| username | string | OPTIONAL: The username that is being queried for. | 2|
+| need_key | bool | OPTIONAL: This field should be set to false when a server originating the query message does not wish to receive the encryption key in the response. | 3 |
+
+**IMPORTANT NOTE:** The AddressRequest message must contain the address field *or* the username field, but not both. One or the other must be omitted.
+
+###### RES Message (AddressResponse)
+
+The AddressResponse message is used to return the location of an address based on an AddressRequest message.
+
+| Field | Object Type | Description | Protocol Buffers Field Number |
+|-------|-------------|-------------|-------------------------------|
+| server_location | string | The exact value of the `location` field specified for the address queried for when it originally sent an `AddressRegistration` message. | 1 |
+| address | string | The addresss that was specified in the `AddressRequest` message to be queried for. | 2 |
+| public_key | Byte Array | OPTIONAL: The exact value of the `public_key` field originally registered for the address. Only returned when the `need_key` field of the `AddressRequest` message is not false. | 3 |
+
 #### Server Messages
 
-#### Client Messages
+#### Utility Messages
