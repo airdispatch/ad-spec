@@ -14,7 +14,7 @@ The protocol is able to abstract away the problems of addressing, security, and 
   1. [Summary of Terms](https://github.com/airdispatch/ad-spec#summary-of-terms)
   2. [Message Structure](https://github.com/airdispatch/ad-spec#message-structure)
   3. [Message Signatures](https://github.com/airdispatch/ad-spec#message-signatures)
-  4. Messsage Types
+  4. [Messsage Types](https://github.com/airdispatch/ad-spec/blob/master/README.md#message-types)
     1. Tracker Messages
     2. Server Messages
     3. Client Messages
@@ -79,7 +79,7 @@ Each message transferred on the Airdisaptch protocol is embedded in the [SignedM
 | payload      | Byte Array   | The actual message being transferred | 1 |
 | signing_key  | Byte Array   | The ECDSA public key converted to bytes as shown above | 2 |
 | signature    | `Signature`  | An additional data type that stores the signature | 3 |
-| message_type | string       | The type of message contained in the payload as defined in the Data Types section | 4 |
+| message_type | string       | Any defined 3-character `Message Type` as specified in the table [here](https://github.com/airdispatch/ad-spec/blob/master/README.md#message-types). | 4 |
 | signature_function | string | **OPTIONAL**: currently unused, will be used in the future to specify using an algorithm other than ECDSA on the P256 curve | 5 |
 
 The `Signature` data structure ([implemented here](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L112)):
@@ -96,15 +96,15 @@ The current protocol is divided into several different types of messages as outl
 
 | Message Type  | Implementation Name | Description                            | Defined As      |
 |---------------|---------------------|----------------------------------------|-----------------|
-| REG           | AddressRegistration | Used to register an address and location with a tracker. | Tracker |
-| QUE           | AddressRequest      | Used to query a tracker for an address's location. | Tracker |
-| RES           | AddressResponse     | Returned by a tracker specifying the location for the requested address. | Tracker |
-| ALE           | Alert               | Used to alert a receiving server to new mail. | Server |
-| RET           | RetrieveData        | Used to download data from a mailserver.      | Server |
-| SEN           | SendMailRequest     | Used to request that a server send a message on a client's behalf. | Client |
-| ARR           | ArrayedData         | Used to signifiy that multiple Airdispatch messages follow. | Utility |
-| MAI           | Mail                | The message type that holds the actual message. | Utility |
-| ---           | MailData            | The key-value store that is the message metadata. | Utility |
+| REG           | [AddressRegistration](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L17) | Used to register an address and location with a tracker. | Tracker |
+| QUE           | [AddressRequest](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L25)      | Used to query a tracker for an address's location. | Tracker |
+| RES           | [AddressResponse](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L35)     | Returned by a tracker specifying the location for the requested address. | Tracker |
+| ALE           | [Alert](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L56)               | Used to alert a receiving server to new mail. | Server |
+| RET           | [RetrieveData](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L65)        | Used to download data from a mailserver.      | Server |
+| SEN           | [SendMailRequest](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L47)     | Used to request that a server send a message on a client's behalf. | Client |
+| ARR           | [ArrayedData](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L77)         | Used to signifiy that multiple Airdispatch messages follow. | Utility |
+| MAI           | [Mail](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L82)                | The message type that holds the actual message. | Utility |
+| ---           | [MailData](https://github.com/airdispatch/airdispatch-protocol/blob/master/airdispatch/Message.proto#L88)            | The key-value store that contains the message data and metadata. | Utility |
 
 #### Tracker Messages
 
