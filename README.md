@@ -18,12 +18,8 @@ The protocol is able to abstract away the problems of addressing, security, and 
     1. [Tracker Messages](https://github.com/airdispatch/ad-spec#tracker-messages)
     2. [Server Messages](https://github.com/airdispatch/ad-spec#server-messages)
     3. Utility Messages
-  5. Server Protocol
-    1. Responds To
-    2. Returns
-  6. Tracker Protocol
-    1. Responds To
-    2. Returns
+  5. Tracker Protocol
+  6. Server Protocol
   7. Mail Data Format
     1. Supported Data Types
     2. Encryption
@@ -199,7 +195,7 @@ The SendMailRequest message is used to request that a server deliver a piece of 
 | to_address | repeated string | The array of addresses that the message should be delivered to. | 1 |
 | stored_message | Byte Array | A signed copy of the MAI message that should be transferred. | 2 |
 
-**Public Messages**: Some messages should be public an available to any user that subscribes to updates from a particular address. Messages can be designated as public if the `to_address` field is omitted.
+**Public Messages**: Some messages should be public and available to any user that subscribes to updates from a particular address. Messages can be designated as public if the `to_address` field is omitted.
 
 #### Utility Messages
 
@@ -214,3 +210,9 @@ The ArrayedData message is sent when multiple airdispatch messages of the same t
 ###### MAI Message (Mail)
 
 This will be covered in detail in section 7.
+
+### Tracker Protocol
+
+### Server Protocol
+
+### Mail Data Format
