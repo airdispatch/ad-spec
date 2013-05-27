@@ -14,9 +14,9 @@ The protocol is able to abstract away the problems of addressing, security, and 
   1. [Summary of Terms](https://github.com/airdispatch/ad-spec#summary-of-terms)
   2. [Message Structure](https://github.com/airdispatch/ad-spec#message-structure)
   3. [Message Signatures](https://github.com/airdispatch/ad-spec#message-signatures)
-  4. [Messsage Types](https://github.com/airdispatch/ad-spec/blob/master/README.md#message-types)
-    1. Tracker Messages
-    2. Server Messages
+  4. [Messsage Types](https://github.com/airdispatch/ad-spec#message-types)
+    1. [Tracker Messages](https://github.com/airdispatch/ad-spec#tracker-messages)
+    2. [Server Messages](https://github.com/airdispatch/ad-spec#server-messages)
     3. Utility Messages
   5. Server Protocol
     1. Responds To
@@ -202,3 +202,15 @@ The SendMailRequest message is used to request that a server deliver a piece of 
 **Public Messages**: Some messages should be public an available to any user that subscribes to updates from a particular address. Messages can be designated as public if the `to_address` field is omitted.
 
 #### Utility Messages
+
+###### ARR Message (ArrayedData)
+
+The ArrayedData message is sent when multiple airdispatch messages of the same type follow. It prompts the server to keep the connection open, and continue to attempt to read messages.
+
+| Field | Object Type | Description | Protocol Buffers Field Number |
+|-------|-------------|-------------|-------------------------------|
+| number_of_messages | uint32 | The number of airdispatch messages that follow. | 1 |
+
+###### MAI Message (Mail)
+
+This will be covered in detail in section 7.
