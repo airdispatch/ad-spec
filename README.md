@@ -17,7 +17,7 @@ The protocol is able to abstract away the problems of addressing, security, and 
   4. [Messsage Types](https://github.com/airdispatch/ad-spec#message-types)
     1. [Tracker Messages](https://github.com/airdispatch/ad-spec#tracker-messages)
     2. [Server Messages](https://github.com/airdispatch/ad-spec#server-messages)
-    3. Utility Messages
+    3. [Utility Messages](https://github.com/airdispatch/ad-spec#utility-messages)
   5. Tracker Protocol
   6. Server Protocol
   7. Mail Data Format
@@ -212,6 +212,34 @@ The ArrayedData message is sent when multiple airdispatch messages of the same t
 This will be covered in detail in section 7.
 
 ### Tracker Protocol
+
+The tracker only needs to respond to two different messages: the REG message and the QUE message.
+
+###### Upon Receiving a REG Message
+
+When a tracking server receives a REG message, it must do the following:
+  1. Determine the registering address from the signing key. (And that it matches the supplied address in the message.)
+  2. Find the record in its database for that address.
+  3. Replace *all* fields with the information contained within the REG message.
+  4. Close the connection. If there was a problem, return an Error Message.
+
+Possible Error Sources:
+  - The registering address is not allowed to be on that tracking server.
+  - Not enough information was contained in the message.
+  - Some sort of 'lock' was on the record, and it cannot be edited at this time.
+  - Errors not related to the request (database connection error, internal errors, etc.)
+
+###### Upon Receiving a QUE Message
+
+When a tracking server receives a QUE message, it must do the following:
+  1. Find the database record for the specified address.
+  2. Respond with *all* of the information in the database in the form of a RES message. (It may omit the public_key if specified by the QUE message).
+  3. Or return an error if applicable.
+
+Possible Error Sources:
+  - The originating address is not allowed to query the tracking server.
+  - The address being queried for does not have a record on that tracking server.
+  - Internal Errors
 
 ### Server Protocol
 
