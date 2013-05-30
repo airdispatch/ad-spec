@@ -18,8 +18,8 @@ The protocol is able to abstract away the problems of addressing, security, and 
     1. [Tracker Messages](https://github.com/airdispatch/ad-spec#tracker-messages)
     2. [Server Messages](https://github.com/airdispatch/ad-spec#server-messages)
     3. [Utility Messages](https://github.com/airdispatch/ad-spec#utility-messages)
-  5. Tracker Protocol
-  6. Server Protocol
+  5. [Tracker Protocol](https://github.com/airdispatch/ad-spec#tracker-protocol)
+  6. [Server Protocol](https://github.com/airdispatch/ad-spec#server-protocol)
   7. Mail Data Format
     1. Supported Data Types
     2. Encryption
@@ -242,5 +242,43 @@ Possible Error Sources:
   - Internal Errors
 
 ### Server Protocol
+
+The server must respond to three different messages: ALE, RET, and SEN.
+
+###### Upon Receiving an ALE message
+
+When a mailserver receives an ALE message it may do several different things:
+  - File the alert into a mailbox for the client to download later.
+  - Immediately send a RET message back to download and cache the message - this is useful if the server has to do processing on the message before it is delivered to the client.
+
+The server may return an error if:
+  - The address field on the alert message does not have an account on the server.
+  - The originating address is blocked from the server.
+  - Internal Error
+
+###### Upon Receiving a RET message
+
+When a mailserver receives a RET message, it must:
+  1. Determine the originating address, and if it is allowed to use the server.
+  2. Check to see if they have any messages of the given type.
+  3. Return either an ARR message + MAI/ALE messages or return a single MAI/ALE message.
+
+The server may return an error if:
+  - The originating address has no messages available.
+  - The originating address is not allowed to use the server.
+  - Internal Error
+
+###### Upon Receiving a SEN message
+
+When a mailserver receives a SEN message, it must:
+  1. Store the presigned MAI message in an 'outgoing' mailbox.
+  2. Use a QUE message to determine the location of the address that the mail is being sent to.
+  3. Create an ALE message to send to the location determined in Step 2.
+
+The server may return an error if:
+  - The 'to address' cannot be looked up on any of the server's trackers.
+  - There was an error sending the ALE message.
+  - The originating address is not allowed to use the server.
+  - Internal Errors
 
 ### Mail Data Format
