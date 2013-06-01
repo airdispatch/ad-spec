@@ -282,3 +282,31 @@ The server may return an error if:
   - Internal Errors
 
 ### Mail Data Format
+
+The mail structure is the most complicated message type as it is the most fundamental. This is the `Mail` structure.
+
+| Field | Object Type | Description | Protocol Bufferes Field Number |
+|-------|-------------|-------------|--------------------------------|
+| from_address | string | The address that the mail is originating from. | 1 |
+| encryption | string | The encryption format of the message. | 2 |
+| data | Byte Array | This is the encrypted data of the message. | 3 |
+
+Currently, the only legal values of `encryption` are 'none' and 'rsa2048'.
+
+The payload is a protocol buffers marshalled `MailData` object encrypted with the algorithm specified in `encryption`.
+
+The `MailData` object:
+
+| Field | Object Type | Description | Protocol Bufferes Field Number |
+|-------|-------------|-------------|--------------------------------|
+| payload | MailData.DataType (repeated) | This repeated field represents the entire key-value store of the message. | 1 |
+
+The `MailData` object only contains an array of `MailData.DataType` objects. This object is defined below:
+
+| Field | Object Type | Description | Protocol Bufferes Field Number |
+|-------|-------------|-------------|--------------------------------|
+| type_name | string | This is the 'key' of the key-value pair. It is used to identify the encoding and nature of the data stored in the `payload`. | 1 |
+| payload | Byte Array | This is the 'value' of this key-value pair in byte form. It may be encoded however the specific `type_name` is agreed to be encoded. | 2 |
+| encryption | string | OPTIONAL: used to specify a different encryption for this payload. | 3 |
+
+Essentially, the mail object contains an encrypted key-value store that represents the content of the message. Because we are using a key-value store, we can use the keys to identify the types of data contained in the message. This allows one to insert arbitrary data that may be ignored by most clients or to filter out specific data (like events, reminders, or notifications).
