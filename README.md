@@ -20,11 +20,12 @@ The protocol is able to abstract away the problems of addressing, security, and 
     3. [Utility Messages](https://github.com/airdispatch/ad-spec#utility-messages)
   5. [Tracker Protocol](https://github.com/airdispatch/ad-spec#tracker-protocol)
   6. [Server Protocol](https://github.com/airdispatch/ad-spec#server-protocol)
-  7. Mail Data Format
+  7. [Mail Data Format](https://github.com/airdispatch/ad-spec#mail-data-format)
     1. Supported Data Types
     2. Encryption
-  8. Race Conditions
-  9. Returning Errors
+  8. Address Format
+  9. Race Conditions
+  10. Returning Errors
 
 ### Summary of Terms
 
@@ -283,7 +284,9 @@ The server may return an error if:
 
 ### Mail Data Format
 
-The mail structure is the most complicated message type as it is the most fundamental. This is the `Mail` structure.
+The mail structure is the most complicated message type as it is the most fundamental.
+
+###### Mail Message (MAI)
 
 | Field | Object Type | Description | Protocol Bufferes Field Number |
 |-------|-------------|-------------|--------------------------------|
@@ -295,13 +298,15 @@ Currently, the only legal values of `encryption` are 'none' and 'rsa2048'.
 
 The payload is a protocol buffers marshalled `MailData` object encrypted with the algorithm specified in `encryption`.
 
-The `MailData` object:
+###### MailData Message
 
 | Field | Object Type | Description | Protocol Bufferes Field Number |
 |-------|-------------|-------------|--------------------------------|
 | payload | MailData.DataType (repeated) | This repeated field represents the entire key-value store of the message. | 1 |
 
-The `MailData` object only contains an array of `MailData.DataType` objects. This object is defined below:
+The `MailData` object only contains an array of `MailData.DataType` objects.
+
+###### MailData.DataType Message
 
 | Field | Object Type | Description | Protocol Bufferes Field Number |
 |-------|-------------|-------------|--------------------------------|
@@ -310,3 +315,37 @@ The `MailData` object only contains an array of `MailData.DataType` objects. Thi
 | encryption | string | OPTIONAL: used to specify a different encryption for this payload. | 3 |
 
 Essentially, the mail object contains an encrypted key-value store that represents the content of the message. Because we are using a key-value store, we can use the keys to identify the types of data contained in the message. This allows one to insert arbitrary data that may be ignored by most clients or to filter out specific data (like events, reminders, or notifications).
+
+#### Supported Data Types
+
+#### Encryption
+
+### Address Format
+
+Airdispatch supports two different types of addressing.
+
+###### Airdispatch Addressing
+
+Addresses are computed using the ECDSA public key used to sign the message (seen in section 3). After changing the public key into a ByteArray, follow the following steps to get the Airdispatch Address. This is the address that must be used for all correspondence.
+
+1. Calculate the SHA-256 Hash of the Public Key.
+2. Calculate the RIPEMD-160 Hash of that.
+3. Hash the output of Step 2 with SHA-256 twice.
+4. Append the first four characters from the output of Step 3 to the end of Step 2 (This is the final address).
+
+###### Legacy Addressing
+
+Legacy addressing is included for the purposes of migration from the old email system as well as ease of sharing addresses. They are formatted like [regular email addresses](http://en.wikipedia.org/wiki/Email_address), although they are encoded with UTF-8.
+
+Example:
+
+    username@tracker.com
+
+As you can see, the address is formatted with the username [registered at the tracker](https://github.com/airdispatch/ad-spec#reg-message-addressregistration), followed by the 'at-sign', followed by the tracker that the username was registered with. This type of addressing may only be used from legacy email clients or from the first correspondence of a user on the airdispatch system.
+
+This type of address is recommended for sharing, and if it is used in a client to send mail, the client must perform the following actions:
+
+1. Lookup the location of the address by sending a [QUE message](https://github.com/airdispatch/ad-spec#que-message-addressrequest) to the server specified in the address
+2. Store the address returned by the [RES message](https://github.com/airdispatch/ad-spec#res-message-addressresponse) in the internal 'Address Book' for all future correspondence. This ensures that the client will always get the correct location, even if the user changes their username.
+
+Legacy addressing allows backwards compatibility with the existing email system, as the tracker will translate the old email into an airdipsatch mail message and forward it on.
