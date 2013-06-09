@@ -21,9 +21,9 @@ The protocol is able to abstract away the problems of addressing, security, and 
   5. [Tracker Protocol](https://github.com/airdispatch/ad-spec#tracker-protocol)
   6. [Server Protocol](https://github.com/airdispatch/ad-spec#server-protocol)
   7. [Mail Data Format](https://github.com/airdispatch/ad-spec#mail-data-format)
-    1. Supported Data Types
-    2. Encryption
-  8. Address Format
+    1. [Supported Data Types](https://github.com/airdispatch/ad-spec#supported-data-types)
+    2. [Encryption](https://github.com/airdispatch/ad-spec#encryption)
+  8. [Address Format](https://github.com/airdispatch/ad-spec#address-format)
   9. Race Conditions
   10. Returning Errors
 
@@ -317,6 +317,38 @@ The `MailData` object only contains an array of `MailData.DataType` objects.
 Essentially, the mail object contains an encrypted key-value store that represents the content of the message. Because we are using a key-value store, we can use the keys to identify the types of data contained in the message. This allows one to insert arbitrary data that may be ignored by most clients or to filter out specific data (like events, reminders, or notifications).
 
 #### Supported Data Types
+
+There are strict rules governing the use of Airdispatch data type names, and how certain data types are stored. We recommend that the `type_name` is in the form of a go package name. For example, a text package that comes with the framework could have the `type_name` of `airdispat.ch/text`. This allows anyone to create their own data types to support the applications that they create using Airdispatch.
+
+We are including several different data types by default, and all clients are expected to acknowledge them. They are broken up below by package name.
+
+###### airdispat.ch/text
+
+This pacakge represents arbitrary text in an airdispatch message. It is broken down by the encoding used for the text:
+
+  - airdispat.ch/text/ascii
+  - airdispat.ch/text/utf8
+  - airdispat.ch/text/utf16
+
+All text is assumed to be plain. However, Airdispatch clients should preferably have built in support for [markdown](http://daringfireball.net/projects/markdown/) (used by appending `/markdown` to any of the above URLs) and [HTML](http://www.w3.org/html/wg/drafts/html/master/) (indicated by appending `/html` to any of the above URLs).
+
+###### airdispat.ch/attachment
+
+This represents an attatchment, or binary file, that comes with the message. This can appear in several different formats:
+
+  1. In the message itself.
+  2. As a publicly-accesible URL.
+  3. As a private file stored in the mailserver.
+
+###### airdispat.ch/user
+
+###### airdispat.ch/group
+
+###### airdispat.ch/info
+
+###### schema.org
+
+We will be adding support for [schema.org](http://schema.org) data types as time goes on. Feel free to use them as needed in your messages.
 
 #### Encryption
 
