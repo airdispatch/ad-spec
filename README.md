@@ -242,6 +242,16 @@ Possible Error Sources:
   - The address being queried for does not have a record on that tracking server.
   - Internal Errors
 
+###### Tracker Security Measures
+
+The crux of the Airdispatch system lies in the Tracking servers. A rogue tracking server could supply Airdispatch users with false locations - compromising the security of the system. We hope to combat this by storing the address associated with the Tracking servers in the software. However, this is not always possible. For example, assume that a user has entered a Legacy Address and wishes to send a message to it. If the software is querying a tracking server in the address for the first time, it has no idea if it communicating with the actual server or a fake server in a Man in the Middle Attack. We hope to fix this problem by introducing features of Airdispatch into the DNS servers.
+
+Airdispatch trackers are expected to add a new TXT record to the domain that the tracking server is hosted on. This TXT record will be of the following form:
+
+    adtp__cert::tracking_server_address
+    
+Where `tracking_server_address` is the public facing address of the keys used by the tracking server. In this way, we can offload the security issue onto the DNS system. Assuming that DNS is secure, the software will be able to verify that there is no MITM by simply comparing the address of the Query Response messages to the address listed in the DNS record. Currently this feature is not *required* in teh protocol; however, the software should warn a user if it is going to connect to a tracking server for the first time that does not implement this security feature.
+
 ### Server Protocol
 
 The server must respond to three different messages: ALE, RET, and SEN.
