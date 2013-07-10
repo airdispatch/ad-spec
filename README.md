@@ -381,3 +381,19 @@ This type of address is recommended for sharing, and if it is used in a client t
 2. Store the address returned by the [RES message](https://github.com/airdispatch/ad-spec#res-message-addressresponse) in the internal 'Address Book' for all future correspondence. This ensures that the client will always get the correct location, even if the user changes their username.
 
 Legacy addressing allows backwards compatibility with the existing email system, as the tracker will translate the old email into an airdipsatch mail message and forward it on.
+
+###### Direct Addressing
+
+Direct addressing is used for taking the tracker out of the addressing equation. **Direct addressing is not recommended for use.**
+
+Example:
+
+    airdispatch_address@@mailserver.com
+    
+###### Individual Mail Addressing
+
+To create a link to a specific mail message, Airdispatch supports the following format
+
+    airdispatch_address::message_id
+
+Notice that two colons are used to seperate the Airdispatch Address (which may be in any form: Airdispatch, Legacy, or Direct). The reason that we chose to use two colons was so that it wouldn't conflict with specifying a port number in the Airdispatch Address portion of the Message Address.
