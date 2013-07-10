@@ -301,6 +301,8 @@ The mail structure is the most complicated message type as it is the most fundam
 | Field | Object Type | Description | Protocol Bufferes Field Number |
 |-------|-------------|-------------|--------------------------------|
 | from_address | string | The address that the mail is originating from. | 1 |
+| to_address | string | The address that the mail is being sent to. | 4 |
+| timestamp | uint64 | The time (represented in seconds from the UNIX epoch) that the message was sent. | 5 |
 | encryption | string | The encryption format of the message. | 2 |
 | data | Byte Array | This is the encrypted data of the message. | 3 |
 
