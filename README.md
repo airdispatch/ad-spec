@@ -24,8 +24,7 @@ The protocol is able to abstract away the problems of addressing, security, and 
     1. [Supported Data Types](https://github.com/airdispatch/ad-spec#supported-data-types)
     2. [Encryption](https://github.com/airdispatch/ad-spec#encryption)
   8. [Address Format](https://github.com/airdispatch/ad-spec#address-format)
-  9. Race Conditions
-  10. Returning Errors
+  9. [Protocol Extensions](https://github.com/airdispatch/ad-spec#protocol-extensions)
 
 ### Summary of Terms
 
@@ -212,6 +211,17 @@ The ArrayedData message is sent when multiple airdispatch messages of the same t
 
 This will be covered in detail in section 7.
 
+###### ERR Message (Error)
+
+The ERR message is returned when the reciepient of a message is unable to process a message request successfully. Acceptable reasons for returning an error are detailed in the Protol details below.
+
+| Field | Object Type | Description | Protocol Buffers Field Number |
+|-------|-------------|-------------|-------------------------------|
+| code | string | Error code number as defined by the protocol. | 1 |
+| description   | string | OPTIONAL: A helpful description of what went wrong. | 2 |
+
+Currently, each Error message requires a code. For now, the only acceptable code is `400`; however, in the future, codes will be specified for different types of errors.
+
 ### Tracker Protocol
 
 The tracker only needs to respond to two different messages: the REG message and the QUE message.
@@ -392,7 +402,7 @@ This type of address is recommended for sharing, and if it is used in a client t
 1. Lookup the location of the address by sending a [QUE message](https://github.com/airdispatch/ad-spec#que-message-addressrequest) to the server specified in the address
 2. Store the address returned by the [RES message](https://github.com/airdispatch/ad-spec#res-message-addressresponse) in the internal 'Address Book' for all future correspondence. This ensures that the client will always get the correct location, even if the user changes their username.
 
-Legacy addressing allows backwards compatibility with the existing email system, as the tracker will translate the old email into an airdipsatch mail message and forward it on.
+Legacy addressing allows backwards compatibility with the existing email system, as the tracker should translate the old email into an airdipsatch mail message and forward it on.
 
 ###### Direct Addressing
 
@@ -409,3 +419,16 @@ To create a link to a specific mail message, Airdispatch supports the following 
     airdispatch_address::message_id
 
 Notice that two colons are used to seperate the Airdispatch Address (which may be in any form: Airdispatch, Legacy, or Direct). The reason that we chose to use two colons was so that it wouldn't conflict with specifying a port number in the Airdispatch Address portion of the Message Address.
+
+### Protocol Extensions
+
+The Airdispatch protocol is designed to be extensible. Therefore, it accepts protocol extensions in a specific way.
+
+A protocol extension may define one or more of the following:
+
+1. A specific Message ID (to be retrieved)
+2. A specific set of Mail DataTypes (names and the information contained therein)
+3. A way to dispaly a certain type of Mail
+4. A way to detect a certain type of Mail (by specifying which DataTypes are required.)
+
+The Airdispatch team will publish prelimenary protocol extensions in this repository in the `Extensions` folder. However, pull requests are welcome to incorporate more and more functionality.
