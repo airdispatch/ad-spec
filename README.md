@@ -430,5 +430,14 @@ A protocol extension may define one or more of the following:
 2. A specific set of Mail DataTypes (names and the information contained therein)
 3. A way to dispaly a certain type of Mail
 4. A way to detect a certain type of Mail (by specifying which DataTypes are required.)
+5. A specific DataType (and its associated byte representation)
+
+Each Protocol Extension is said to adhere to the same standards as this document, and it must be explicitly clear if it wants to take precedence over this protocol.
+
+##### Current Protocol Extensions
 
 The Airdispatch team will publish prelimenary protocol extensions in this repository in the `Extensions` folder. However, pull requests are welcome to incorporate more and more functionality.
+
+The list of current Protocol Extensions is as follows:
+
+- `ad-profiles`
