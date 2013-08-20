@@ -441,3 +441,4 @@ The Airdispatch team will publish prelimenary protocol extensions in this reposi
 The list of current Protocol Extensions is as follows:
 
 - `ad-profiles`
+- `ad-notes`
