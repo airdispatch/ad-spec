@@ -7,7 +7,9 @@ The Airdispatch Profiles protocol will be responsible for converting Airdispatch
 
 ### Messages
 
-The Airdispatchs Profiles protocol functions by having a publicly available message under the id `profile`.
+The Airdispatchs Profiles protocol functions by having a publicly available message under the id `airdispatch_address::profile`.
+
+For example, if one was attempting to get the profile from address `a596aa4e707037a033b638e7b57fb077a1f98cbe7864d6b4`, they would query for the message id `a596aa4e707037a033b638e7b57fb077a1f98cbe7864d6b4::profile`. Legacy and direct addressing is not allowed here.
 
 This message MUST contain the following DataTypes:
 
