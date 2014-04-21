@@ -1,6 +1,8 @@
 The Airdispatch Protocol
 ============
 
+!!! This Specification is not currently correct. It will be updated in the next couple of weeks to reflect the actual protocol changes.
+
 This repository will contain the specifications for the Airdispatch protocol.
 
 ### Introduction
